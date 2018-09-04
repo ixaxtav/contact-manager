@@ -22,7 +22,7 @@ class App extends React.Component{
             <Provider>
                 <Router>
                     <div className = "App">
-                        <Header branding="Contact Manager" />
+                        <Header branding="Ixax"/>
                         <div className="container">
                             <Switch>
                                 <Route exact path="/" component= {Contacts} />
