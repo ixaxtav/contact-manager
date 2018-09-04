@@ -4,7 +4,9 @@ import TextInputGroup from '../layout/TextInputGroup';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
-class AddContact extends React.Component {
+
+
+class EditContact extends React.Component {
     constructor(){
         super();
         this.state = {
@@ -14,6 +16,20 @@ class AddContact extends React.Component {
             errors: {}
             
         };
+    }
+    
+    
+    async componentDidMount(){
+        const {id} = this.props.match.params;
+        const res = await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`);
+    
+        const contact = res.data;
+        this.setState({
+            name: contact.name,
+            email: contact.email,
+            phone: contact.phone
+        });
+        
     }
     
     async onSubmit(dispatch, e){
@@ -33,16 +49,19 @@ class AddContact extends React.Component {
             this.setState({errors: {phone: 'Phone is required'}});
             return;
         }
-        const newContact = {
+        
+        const updContact = {
             name,
             email,
             phone
         };
         
-        const res = await axios.post('https://jsonplaceholder.typicode.com/users', newContact);
-        dispatch({type: 'ADD_CONTACT', payload: res.data});
+        const {id} = this.props.match.params;
         
-        
+        const res = await axios.put(`https://jsonplaceholder.typicode.com/users/${id}`, updContact);
+       
+        dispatch({type: 'UPDATE_CONTACT', payload: res.data});       
+       
         this.setState({
             name: '',
             email: '',
@@ -50,7 +69,7 @@ class AddContact extends React.Component {
             errors: {}
         });
         
-        this.props.history.push('/');
+       this.props.history.push('/');
         
      }
     onChange(e){this.setState({[e.target.name]: e.target.value});}
@@ -66,7 +85,7 @@ class AddContact extends React.Component {
                   const {dispatch} = value; 
                   return (
                       <div className = "card mb-3">
-                          <div className ="card-header"> Add Contact </div>
+                          <div className ="card-header"> Edit Contact </div>
                           <div className = "card-body"> 
                               <form onSubmit = {this.onSubmit.bind(this, dispatch)}>
                                   <TextInputGroup
@@ -96,7 +115,7 @@ class AddContact extends React.Component {
                                   onChange={(e) => this.onChange(e)}
                                   error = {errors.phone}
                                   />    
-                                  <input type = "submit" value = "Add Contact" className = "btn btn-light btn-block"/>
+                                  <input type = "submit" value = "Update Contact" className = "btn btn-light btn-block"/>
                               </form>
                           </div>
                       </div>                  
@@ -112,8 +131,16 @@ class AddContact extends React.Component {
 }
 
     
-AddContact.propTypes = {
-    history: PropTypes
+EditContact.propTypes = {
+    history: PropTypes,
+    match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      email: PropTypes.string,
+      phone: PropTypes.string
+    })
+})
 };
 
-export default AddContact;
+export default EditContact;
